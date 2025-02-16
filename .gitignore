@@ -362,13 +362,10 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# GCP credentials 
+# GCP credentials
 gcp_credentials.json
 
 # docker volumes
 elastic/.docker/es*
 .docker/filebeat/registry/*
 .docker/filebeat/meta.json
-
-# Visual Studio Code
-.vscode

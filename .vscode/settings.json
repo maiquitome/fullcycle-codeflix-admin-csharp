@@ -1,0 +1,8 @@
+{
+    "cSpell.words": ["Codeflix"],
+    "files.exclude": {
+        "**/bin": true,
+        "**/obj": true
+    },
+    "dotnet.defaultSolution": "FC.Codeflix.Catalog.sln"
+}
