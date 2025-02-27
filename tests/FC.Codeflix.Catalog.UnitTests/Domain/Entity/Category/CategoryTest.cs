@@ -122,4 +122,34 @@ public class CategoryTest
         var exception = Assert.Throws<EntityValidationException>(action);
         Assert.Equal("Description should have at most 10.000 characters", exception.Message);
     }
+
+    [Fact(DisplayName = nameof(Activate))]
+    [Trait("Domain", "Category - Aggregates")]
+    public void Activate()
+    {
+        // Arrange
+        var category = new DomainEntity.Category("Category Name", "Category Description", false);
+        Assert.False(category.IsActive);
+
+        // Act
+        category.Activate();
+
+        // Assert
+        Assert.True(category.IsActive);
+    }
+
+    [Fact(DisplayName = nameof(Deactivate))]
+    [Trait("Domain", "Category - Aggregates")]
+    public void Deactivate()
+    {
+        // Arrange
+        var category = new DomainEntity.Category("Category Name", "Category Description");
+        Assert.True(category.IsActive);
+
+        // Act
+        category.Deactivate();
+
+        // Assert
+        Assert.False(category.IsActive);
+    }
 }
