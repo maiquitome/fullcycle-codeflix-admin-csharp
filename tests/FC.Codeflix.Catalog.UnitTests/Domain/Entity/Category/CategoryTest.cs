@@ -113,7 +113,7 @@ public class CategoryTest
     public void InstantiateErrorWhenNameIsGreaterThan255Characters()
     {
         var validCategory = _categoryTestFixture.GetValidCategory();
-        string invalidName = Enumerable.Range(1, 256).Select(_ => "a").Aggregate((a, b) => a + b);
+        string invalidName = _categoryTestFixture.Faker.Lorem.Letter(256);
         Action action = () => new DomainEntity.Category(invalidName, validCategory.Description);
         var exception = Assert.Throws<EntityValidationException>(action);
         Assert.Equal("Name should have at most 255 characters", exception.Message);
@@ -124,7 +124,12 @@ public class CategoryTest
     public void InstantiateErrorWhenDescriptionIsGreaterThan10_000Characters()
     {
         var validCategory = _categoryTestFixture.GetValidCategory();
-        string invalidDescription = Enumerable.Range(1, 10_001).Select(_ => "a").Aggregate((a, b) => a + b);
+
+        Bogus.Faker faker = _categoryTestFixture.Faker;
+        string invalidDescription = faker.Commerce.ProductDescription();
+        while (invalidDescription.Length <= 10_000)
+            invalidDescription += " " + faker.Commerce.ProductDescription();
+
         Action action = () => new DomainEntity.Category(validCategory.Name, invalidDescription);
         var exception = Assert.Throws<EntityValidationException>(action);
         Assert.Equal("Description should have at most 10.000 characters", exception.Message);
@@ -168,8 +173,8 @@ public class CategoryTest
         var category = new DomainEntity.Category(validCategory.Name, validCategory.Description);
         var newValues = new
         {
-            Name = "New Name",
-            Description = "New Description"
+            Name = _categoryTestFixture.GetValidCategoryName(),
+            Description = _categoryTestFixture.GetValidCategoryDescription()
         };
 
         // Act
@@ -187,13 +192,13 @@ public class CategoryTest
         var validCategory = _categoryTestFixture.GetValidCategory();
         var category = new DomainEntity.Category(validCategory.Name, validCategory.Description);
         string currentDescription = category.Description;
-        var newValues = new { Name = "New Name" };
+        var newName = _categoryTestFixture.GetValidCategoryName();
 
         // Act
-        category.Update(newValues.Name);
+        category.Update(newName);
 
         // Assert
-        Assert.Equal(newValues.Name, category.Name);
+        Assert.Equal(newName, category.Name);
         Assert.Equal(currentDescription, category.Description);
     }
 
@@ -237,7 +242,7 @@ public class CategoryTest
     {
         var validCategory = _categoryTestFixture.GetValidCategory();
         var category = new DomainEntity.Category(validCategory.Name, validCategory.Description);
-        string invalidName = "a".PadLeft(256, 'a');
+        string invalidName = _categoryTestFixture.Faker.Lorem.Letter(256);
 
         // Act
         void action() => category.Update(invalidName);
@@ -251,9 +256,18 @@ public class CategoryTest
     [Trait("Domain", "Category - Aggregates")]
     public void UpdateErrorWhenDescriptionIsGreaterThan10_000Characters()
     {
-        var validCategory = _categoryTestFixture.GetValidCategory();
-        var category = new DomainEntity.Category(validCategory.Name, validCategory.Description);
-        string invalidDescription = "a".PadLeft(10_001, 'a');
+        // Arrange
+        var category = new DomainEntity.Category(
+            _categoryTestFixture.GetValidCategoryName(),
+            _categoryTestFixture.GetValidCategoryDescription()
+        );
+
+        Bogus.Faker faker = _categoryTestFixture.Faker;
+
+        string invalidDescription = faker.Commerce.ProductDescription();
+
+        while (invalidDescription.Length <= 10_000)
+            invalidDescription += " " + faker.Commerce.ProductDescription();
 
         // Act
         void action() => category.Update("Category Name", invalidDescription);
